@@ -1,12 +1,11 @@
-package cn.aicnn.chatssespringboot.service;
+package life.chat_ai.service;
 
-import cn.aicnn.chatssespringboot.dto.AIAnswerDTO;
-import cn.aicnn.chatssespringboot.dto.ChatRequestDTO;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import life.chat_ai.dto.AIAnswerDTO;
+import life.chat_ai.dto.ChatRequestDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +16,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+
 
 @SpringBootTest
 class GptServiceImplTest {

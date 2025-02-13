@@ -1,7 +1,8 @@
-package cn.aicnn.chatssespringboot.controller;
+package life.chat_ai.controller;
 
-import cn.aicnn.chatssespringboot.dto.AIAnswerDTO;
-import cn.aicnn.chatssespringboot.service.GptServiceImpl;
+
+import life.chat_ai.dto.AIAnswerDTO;
+import life.chat_ai.service.GptServiceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;

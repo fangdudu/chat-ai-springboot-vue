@@ -5,8 +5,8 @@
     <groupId>cn.aicnn</groupId>
     <artifactId>chat-ai-springboot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>chat-sse-springboot</name>
-    <description>chat-sse-springboot</description>
+    <name>chat-ai-springboot</name>
+    <description>chat-ai-springboot</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -71,7 +71,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>cn.aicnn.chatssespringboot.ChatSseSpringbootApplication</mainClass>
+                    <mainClass>cn.aicnn.chatssespringboot.ChatAISpringbootApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

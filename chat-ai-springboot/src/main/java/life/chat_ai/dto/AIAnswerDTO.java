@@ -1,4 +1,4 @@
-package cn.aicnn.chatssespringboot.dto;
+package life.chat_ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

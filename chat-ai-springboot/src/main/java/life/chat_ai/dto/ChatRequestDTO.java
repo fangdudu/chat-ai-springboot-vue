@@ -1,4 +1,4 @@
-package cn.aicnn.chatssespringboot.dto;
+package life.chat_ai.dto;
 
 import lombok.Data;
 

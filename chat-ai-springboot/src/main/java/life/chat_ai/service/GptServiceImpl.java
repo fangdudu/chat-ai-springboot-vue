@@ -1,12 +1,13 @@
-package cn.aicnn.chatssespringboot.service;
+package life.chat_ai.service;
 
-import cn.aicnn.chatssespringboot.dto.AIAnswerDTO;
-import cn.aicnn.chatssespringboot.dto.ChatRequestDTO;
+
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import life.chat_ai.dto.AIAnswerDTO;
+import life.chat_ai.dto.ChatRequestDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
