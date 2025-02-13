@@ -20,12 +20,20 @@ import java.util.*;
 
 @Service
 public class GptServiceImpl {
-    // api-url注入
+    // 阿里云
     @Value("${aliyun.bailian.api-url}")
     public String ALIYUN_BAILIAN_URL;
-    // api-key注入
     @Value("${aliyun.bailian.api-key}")
     public String ALIYUN_BAILIAN_API_KEY;
+
+    // 字节火山
+    @Value("${bytedance.volcengine.api-url}")
+    public String BYTEDANCE_VOLCENGINE_API_URL;
+    @Value("${bytedance.volcengine.api-key}")
+    public String BYTEDANCE_VOLCENGINE_API_KEY;
+    @Value("${bytedance.volcengine.model}")
+    public String BYTEDANCE_VOLCENGINE_MODEL;
+
 
     //webflux的client
     private WebClient webClient;
@@ -45,7 +53,7 @@ public class GptServiceImpl {
         //构建请求对象
         ChatRequestDTO chatRequestDTO = new ChatRequestDTO();
         //设置模型
-        chatRequestDTO.setModel("deepseek-r1");
+        chatRequestDTO.setModel(BYTEDANCE_VOLCENGINE_MODEL);
         //设置流式返回
         chatRequestDTO.setStream(true);
         ChatRequestDTO.StreamOptions streamOptions = new ChatRequestDTO.StreamOptions();
@@ -68,9 +76,9 @@ public class GptServiceImpl {
         //使用webClient发送消息
         return this.webClient.post()
                 //请求uri
-                .uri(ALIYUN_BAILIAN_URL)
+                .uri(BYTEDANCE_VOLCENGINE_API_URL)
                 //设置成自己的key，获得key的方式可以在下文查看
-                .header("Authorization", "Bearer "+ALIYUN_BAILIAN_API_KEY)
+                .header("Authorization", "Bearer "+BYTEDANCE_VOLCENGINE_API_KEY)
                 //.header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)//设置流式响应
                 .header("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
                 .contentType(MediaType.APPLICATION_JSON)
