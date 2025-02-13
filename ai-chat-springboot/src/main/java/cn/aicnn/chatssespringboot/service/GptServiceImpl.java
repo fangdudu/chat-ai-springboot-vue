@@ -30,7 +30,6 @@ public class GptServiceImpl {
     @PostConstruct
     public void postConstruct() {
         this.webClient = WebClient.builder()//创建webflux的client
-//                .baseUrl("")//填写对应的api地址
                 .defaultHeader("Content-Type", "application/json")//设置默认请求类型
                 .build();
     }
