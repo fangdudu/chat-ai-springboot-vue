@@ -1,5 +1,5 @@
 {
-  "name": "ai-chat-vue",
+  "name": "chat-ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@kangc/v-md-editor": "^2.3.18",
     "@microsoft/fetch-event-source": "^2.0.1",
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.5",
