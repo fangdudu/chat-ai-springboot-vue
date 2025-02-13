@@ -71,7 +71,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>cn.aicnn.chatssespringboot.ChatAISpringbootApplication</mainClass>
+                    <mainClass>life.chat_ai.ChatAISpringbootApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

@@ -1,14 +1,13 @@
 package life.chat_ai.service;
 
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.chat_ai.dto.AIAnswerDTO;
 import life.chat_ai.dto.ChatRequestDTO;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -21,8 +20,14 @@ import java.util.*;
 
 @Service
 public class GptServiceImpl {
-    //webflux的client
+    // api-url注入
+    @Value("${aliyun.bailian.api-url}")
+    public String ALIYUN_BAILIAN_URL;
+    // api-key注入
+    @Value("${aliyun.bailian.api-key}")
+    public String ALIYUN_BAILIAN_API_KEY;
 
+    //webflux的client
     private WebClient webClient;
 
     //用于读取第三方的返回结果
@@ -60,13 +65,12 @@ public class GptServiceImpl {
 
         //构建请求json
         String paramJson = JSONUtil.toJsonStr(chatRequestDTO);
-
         //使用webClient发送消息
         return this.webClient.post()
                 //请求uri
-                .uri("https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions")
+                .uri(ALIYUN_BAILIAN_URL)
                 //设置成自己的key，获得key的方式可以在下文查看
-                .header("Authorization", "Bearer sk-d5543abc68eb47e79fa44be2ae04dd5d")
+                .header("Authorization", "Bearer "+ALIYUN_BAILIAN_API_KEY)
                 //.header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)//设置流式响应
                 .header("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
                 .contentType(MediaType.APPLICATION_JSON)

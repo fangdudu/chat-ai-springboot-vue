@@ -1,3 +1,8 @@
 server:
   port: 8089
 
+# 阿里云百炼
+aliyun:
+  bailian:
+    api-url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+    api-key: 百炼AI平台申请的api-Key
