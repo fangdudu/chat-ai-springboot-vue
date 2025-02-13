@@ -13,7 +13,7 @@
           </g>
         </svg>
       </button>
-      <span>AI Chat</span>
+      <span>Chat-AI</span>
       <div class="relative inline-block text-left">
         <button id="setting" class="hover:bg-blue-400 rounded-md p-1">
           <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -151,7 +151,7 @@ export default {
         {
           isFirst:true,
           think: false,
-          text: "你好，我是AI Chat，有什么我能帮助你的吗？",
+          text: "你好，我是Chat-AI，有什么我能帮助你的吗？",
           isMine: false,
           isInfoExpanded: false,
           infoContent: "这是一个信息提示"
