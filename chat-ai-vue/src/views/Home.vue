@@ -73,7 +73,7 @@
             <div @click="message.isInfoExpanded = !message.isInfoExpanded" :class="['border', 'text-black', 'p-2', 'rounded-lg', 'max-w-xs','mb-4 ', 'w-full',message.think ? 'bg-yellow-200' : 'bg-gray-50' ]">
               <div class="flex items-center justify-between">
                 <span class="inline-flex items-center space-x-2">
-                  <template v-if="message.think">
+                  <template v-if="message.think && !message.suspend">
                     <!-- 添加 flex 容器和间距 -->
                     <div class="flex items-center space-x-2">
                       <span>思考中</span>
@@ -83,8 +83,11 @@
                       </svg>
                     </div>
                   </template>
-                  <template v-else>
+                  <template v-if="!message.think && !message.suspend">
                     已深度思考（用时{{this.messages.costTime}}秒）
+                  </template>
+                  <template v-if="message.suspend">
+                    <span class="text-red-400">已暂停</span>
                   </template>
                 </span>
                 <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'transform rotate-180': message.isInfoExpanded }" viewBox="0 0 24 24" fill="none"
@@ -111,13 +114,19 @@
       <input type="text" v-model="this.inputText" placeholder="在这里输入消息..."
              class="flex-1 border rounded-full px-4 py-2 focus:outline-none">
       <!--输入按钮-->
-      <button class="bg-blue-500 text-white rounded-full p-2 ml-2 hover:bg-blue-600 focus:outline-none" @click="sendSSEMessage">
+      <button v-if="!isChatting" class="bg-blue-500 text-white rounded-full p-2 ml-2 hover:bg-blue-600 focus:outline-none" @click="sendMessage">
         <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff">
           <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
           <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
           <g id="SVGRepo_iconCarrier">
             <path d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
           </g>
+        </svg>
+      </button>
+      <button v-if="isChatting" class="bg-red-400 text-white rounded-full p-2 ml-2 hover:bg-red-500 focus:outline-none focus:bg-red-500" @click="suspendChat">
+        <!-- 暂停图标 -->
+        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 6V18M16 6V18" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
@@ -132,6 +141,7 @@ export default {
   name: 'Home',
   data() {
     return {
+      isChatting: false,
       //要发送的问题
       inputText: null,
       // 对话数组
@@ -156,11 +166,24 @@ export default {
     }
   },
   methods: {
-    sendSSEMessage() {
+    suspendChat() {
+      if (this.eventSource) {
+        this.eventSource.close();
+        this.eventSource = null;
+      }
+      this.messages[this.messages.length - 1].think = false;
+      this.messages[this.messages.length - 1].suspend = true;
+      if(this.messages[this.messages.length - 1].text.length == 0){
+        this.messages[this.messages.length - 1].text = '对话已暂停';
+      }
+      this.isChatting = false;
+    },
+    sendMessage() {
       // 只有当eventSource不存在时才创建新的EventSource连接
       if (!this.eventSource) {
+        this.isChatting = true;
         this.messages.push({infoContent: "", text: this.inputText, isMine: true});
-        this.messages.push({think: true, costTime: null,infoContent: "", text: "", isMine: false});
+        this.messages.push({suspend:false,think: true, costTime: null,infoContent: "", text: "", isMine: false});
 
         // 创建新的EventSource连接
         this.eventSource = new EventSource('http://127.0.0.1:8089/completions?messages=' + this.inputText);
@@ -169,16 +192,15 @@ export default {
         // 设置消息接收的回调函数
         this.eventSource.onmessage = (event) => {
           const data = JSON.parse(event.data);
-          if(data.usage !== undefined && data.usage !== null){
-            console.log(data.usage);
-
+          /*if(data.finish_reason !== undefined && data.finish_reason !== null){
+            //console.log(data.usage);
             data.usage.completion_tokens;
             data.usage.prompt_tokens;
             data.usage.total_tokens
 
             this.eventSource.close();
             this.eventSource = null;
-          }
+          }*/
           if (data.choices[0]) {
             if (data.choices[0].delta.reasoning_content && data.choices[0].delta.reasoning_content !== undefined) {
               if (data.choices[0].delta.reasoning_content.trim().length > 0) {
@@ -199,12 +221,14 @@ export default {
 
         // 可选：监听错误事件，以便在出现问题时能够重新连接或处理错误
         this.eventSource.onerror = (event) => {
-          console.log(event);
-          console.error("EventSource failed:", event);
+          // console.log(event);
+          // console.error("EventSource failed:", event);
           // 关闭出错的连接
           this.eventSource.close();
           // 重置eventSource变量，允许重建连接
           this.eventSource = null;
+
+          this.isChatting = false;
         };
       }
     }
