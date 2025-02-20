@@ -12,8 +12,7 @@
           <div class="space-y-2">
             <button
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToDeepSeek"
-              @mouseover="isHovering = true" @mouseleave="isHovering = false"
+              @click="goToDeepSeek" @mouseover="isHovering = true" @mouseleave="isHovering = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering }">
               <img src="../assets/deepseek-color.svg" class="w-4 h-4 mr-1" />
               <span class="flex-grow">DeepSeek-R1</span>
@@ -24,8 +23,7 @@
             </button>
             <button
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToQwen"
-              @mouseover="isHovering2 = true" @mouseleave="isHovering2 = false"
+              @click="goToQwen" @mouseover="isHovering2 = true" @mouseleave="isHovering2 = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering2 }">
               <img src="../assets/qwen-color.svg" class="w-4 h-4 mr-1" />
               <span class="flex-grow">Qwen2.5-VL</span>
@@ -48,7 +46,8 @@
               <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
             <svg v-else class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
-              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </button>
           <span>Qwen2.5-VL</span>
@@ -167,33 +166,70 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 flex items-center">
-          <input type="text" v-model="this.inputText" placeholder="在这里输入消息..."
-            class="flex-1 border rounded-full px-4 py-2 focus:outline-none">
-          <!--输入按钮-->
-          <button v-if="!isChatting"
-            class="bg-blue-500 text-white rounded-full p-2 ml-2 hover:bg-blue-600 focus:outline-none"
-            @click="sendMessage">
-            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-              stroke="#ffffff">
-              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-              <g id="SVGRepo_iconCarrier">
-                <path
-                  d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z"
-                  stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-              </g>
-            </svg>
-          </button>
-          <button v-if="isChatting"
-            class="bg-red-400 text-white rounded-full p-2 ml-2 hover:bg-red-500 focus:outline-none focus:bg-red-500"
-            @click="suspendChat">
-            <!-- 暂停图标 -->
-            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 6V18M16 6V18" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </button>
+
+
+
+        <!-- 输入框 -->
+        <div class="bg-white p-4 flex flex-col space-y-2">
+          <!-- 图片预览区域 -->
+          <div v-if="selectedImages.length > 0" class="flex gap-1.5 overflow-x-auto pb-2">
+            <div v-for="(image, index) in selectedImages" :key="index" class="relative">
+              <img :src="image.url" class="h-10 w-10 object-cover rounded-md border border-gray-200" />
+              <button @click="removeImage(index)" 
+                class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600">
+                ×
+              </button>
+            </div>
+          </div>
+
+          <!-- 输入和按钮区域 -->
+          <div class="flex items-center gap-1 min-w-0">
+            <!-- 图片上传按钮 -->
+            <input
+              type="file"
+              @change="handleImageSelect"
+              multiple
+              accept="image/*"
+              class="hidden"
+              ref="fileInput"
+            >
+            <button 
+              @click="$refs.fileInput.click()"
+              class="flex-shrink-0 p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+              title="上传图片"
+            >
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 16L8.586 11.414C8.96106 11.0389 9.46967 10.8284 10 10.8284C10.5303 10.8284 11.0389 11.0389 11.414 11.414L16 16M14 14L15.586 12.414C15.9611 12.0389 16.4697 11.8284 17 11.8284C17.5303 11.8284 18.0389 12.0389 18.414 12.414L20 14M14 8H14.01M6 20H18C18.5304 20 19.0391 19.7893 19.4142 19.4142C19.7893 19.0391 20 18.5304 20 18V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V18C4 18.5304 4.21071 19.0391 4.58579 19.4142C4.96086 19.7893 5.46957 20 6 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            
+            <!-- 输入框 -->
+            <input type="text" v-model="inputText" placeholder="在这里输入消息..."
+              class="min-w-0 flex-1 border rounded-full px-3 py-1.5 focus:outline-none">
+
+            <!--输入按钮-->
+            <button v-if="!isChatting"
+              class="flex-shrink-0 bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 focus:outline-none"
+              @click="sendMessage">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path
+                    d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z"
+                    stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </g>
+              </svg>
+            </button>
+            <button v-if="isChatting"
+              class="flex-shrink-0 bg-red-400 text-white rounded-full p-1.5 hover:bg-red-500 focus:outline-none focus:bg-red-500"
+              @click="suspendChat">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 6V18M16 6V18" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -216,7 +252,6 @@ export default {
       inputText: null,
       // 对话数组
       messages: [
-        { text: "你好", isMine: true },
         {
           isFirst: true,
           think: false,
@@ -228,6 +263,7 @@ export default {
       ],
       responseFirst: true, // 对话第一次回复
       eventSource: null,
+      selectedImages: [], // 存储选中的图片
     };
   },
   beforeUnmount() {
@@ -310,7 +346,29 @@ export default {
     },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-    }
+    },
+    handleImageSelect(event) {
+      const files = event.target.files;
+      if (files) {
+        Array.from(files).forEach(file => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              this.selectedImages.push({
+                file: file,
+                url: e.target.result
+              });
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      // 清空input，这样相同的文件可以再次选择
+      event.target.value = '';
+    },
+    removeImage(index) {
+      this.selectedImages.splice(index, 1);
+    },
   }
 }
 </script>

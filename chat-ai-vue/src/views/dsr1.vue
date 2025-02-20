@@ -11,8 +11,7 @@
           <div class="space-y-2">
             <button
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToDeepSeek"
-              @mouseover="isHovering = true" @mouseleave="isHovering = false"
+              @click="goToDeepSeek" @mouseover="isHovering = true" @mouseleave="isHovering = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering }">
               <img src="../assets/deepseek-color.svg" class="w-4 h-4 mr-1" />
               <span class="flex-grow">DeepSeek-R1</span>
@@ -23,8 +22,7 @@
             </button>
             <button
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToQwen"
-              @mouseover="isHovering2 = true" @mouseleave="isHovering2 = false"
+              @click="goToQwen" @mouseover="isHovering2 = true" @mouseleave="isHovering2 = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering2 }">
               <img src="../assets/qwen-color.svg" class="w-4 h-4 mr-1" />
               <span class="flex-grow">Qwen2.5-VL</span>
@@ -47,13 +45,16 @@
               <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
             <svg v-else class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
-              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </button>
           <span>DeepSeek-R1</span>
+
+          <!-- 右上角设置按钮 -->
           <div class="relative inline-block text-left">
             <!--设置按钮-->
-            <button id="setting" class="hover:bg-blue-400 rounded-md p-1">
+            <button @click="toggleSettings" class="hover:bg-blue-400 rounded-md p-1">
               <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -68,98 +69,52 @@
               </svg>
             </button>
 
-
-            <div id="dropdown-content"
-              class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg p-2">
-              <a href="#" class="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">
-                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" class="mr-2"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <path
-                      d="M9 21H12M15 21H12M12 21V18M12 18H19C20.1046 18 21 17.1046 21 16V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V16C3 17.1046 3.89543 18 5 18H12ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z"
-                      stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                  </g>
-                </svg>
-                Appearance
-              </a>
-              <a href="#" class="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">
-                <svg width="20px" height="20px" viewBox="0 0 24 24" class="mr-2" fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <path
-                      d="M11.2691 4.41115C11.5006 3.89177 11.6164 3.63208 11.7776 3.55211C11.9176 3.48263 12.082 3.48263 12.222 3.55211C12.3832 3.63208 12.499 3.89177 12.7305 4.41115L14.5745 8.54808C14.643 8.70162 14.6772 8.77839 14.7302 8.83718C14.777 8.8892 14.8343 8.93081 14.8982 8.95929C14.9705 8.99149 15.0541 9.00031 15.2213 9.01795L19.7256 9.49336C20.2911 9.55304 20.5738 9.58288 20.6997 9.71147C20.809 9.82316 20.8598 9.97956 20.837 10.1342C20.8108 10.3122 20.5996 10.5025 20.1772 10.8832L16.8125 13.9154C16.6877 14.0279 16.6252 14.0842 16.5857 14.1527C16.5507 14.2134 16.5288 14.2807 16.5215 14.3503C16.5132 14.429 16.5306 14.5112 16.5655 14.6757L17.5053 19.1064C17.6233 19.6627 17.6823 19.9408 17.5989 20.1002C17.5264 20.2388 17.3934 20.3354 17.2393 20.3615C17.0619 20.3915 16.8156 20.2495 16.323 19.9654L12.3995 17.7024C12.2539 17.6184 12.1811 17.5765 12.1037 17.56C12.0352 17.5455 11.9644 17.5455 11.8959 17.56C11.8185 17.5765 11.7457 17.6184 11.6001 17.7024L7.67662 19.9654C7.18404 20.2495 6.93775 20.3915 6.76034 20.3615C6.60623 20.3354 6.47319 20.2388 6.40075 20.1002C6.31736 19.9408 6.37635 19.6627 6.49434 19.1064L7.4341 14.6757C7.46898 14.5112 7.48642 14.429 7.47814 14.3503C7.47081 14.2807 7.44894 14.2134 7.41394 14.1527C7.37439 14.0842 7.31195 14.0279 7.18708 13.9154L3.82246 10.8832C3.40005 10.5025 3.18884 10.3122 3.16258 10.1342C3.13978 9.97956 3.19059 9.82316 3.29993 9.71147C3.42581 9.58288 3.70856 9.55304 4.27406 9.49336L8.77835 9.01795C8.94553 9.00031 9.02911 8.99149 9.10139 8.95929C9.16534 8.93081 9.2226 8.8892 9.26946 8.83718C9.32241 8.77839 9.35663 8.70162 9.42508 8.54808L11.2691 4.41115Z"
-                      stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                  </g>
-                </svg>
-                Favorite
-              </a>
-              <a href="#" class="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">
-                <svg width="20px" height="20px" viewBox="0 0 24 24" class="mr-2" fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <g id="Warning / Info">
-                      <path id="Vector"
-                        d="M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z"
-                        stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </g>
-                  </g>
-                </svg>
-                More
-              </a>
+            <!--设置选择框-->
+            <div v-show="isSettingsOpen" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div class="py-1">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置选项 1</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置选项 2</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置选项 3</a>
+              </div>
             </div>
           </div>
-
-
-
         </div>
+        <!-- 对话框 -->
         <div class="flex-1 overflow-y-auto p-4">
           <div class="flex flex-col space-y-2">
             <div v-for="(message, index) in messages" :key="index">
-              <div v-if="!message.isMine && !message.isFirst" class="mb-4 w-full">
+              <div v-if="!message.isMine && !message.isFirst" class="mb-4 w-full flex justify-start">
+                <!-- 思考框 -->
                 <div @click="message.isInfoExpanded = !message.isInfoExpanded"
-                  :class="['border', 'text-black', 'p-2', 'rounded-lg', 'max-w-xs', 'mb-4 ', 'w-full', message.think ? 'bg-yellow-200' : 'bg-gray-50']">
-                  <div class="flex items-center justify-between">
-                    <span class="inline-flex items-center space-x-2">
-                      <template v-if="message.think && !message.suspend">
-                        <div class="flex items-center space-x-2">
-                          <span>思考中</span>
-                          <svg class="h-4 w-4 animate-spin text-black-200" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                        </div>
-                      </template>
-                      <template v-if="!message.think && !message.suspend">
-                        已深度思考（用时{{ this.messages.costTime }}秒）
-                      </template>
-                      <template v-if="message.suspend">
-                        <span class="text-red-400">已暂停</span>
-                      </template>
+                  :class="['border', 'text-black', 'p-2', 'rounded-lg', 'inline-block', message.think ? 'bg-yellow-200' : 'bg-gray-50']">
+                  <div class="flex items-center space-x-2">
+                    <span v-if="message.think" class="whitespace-nowrap flex items-center space-x-1">
+                      <span>思考中</span>
+                      <!--旋转 -->
+                      <svg class="h-4 w-4 animate-spin text-black-200 inline-block" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
                     </span>
-                    <svg class="w-4 h-4 transition-transform duration-200"
-                      :class="{ 'transform rotate-180': message.isInfoExpanded }" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor">
-                      <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <span v-else class="whitespace-nowrap">已深度思考（用时{{ this.messages.costTime }}秒）</span>
+                    <svg
+                      :class="['w-4', 'h-4', 'transform', 'transition-transform', message.isInfoExpanded ? 'rotate-180' : '']"
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
-                  <div v-show="message.isInfoExpanded" class="mt-2 text-sm text-black-200">
+                  <div v-show="message.isInfoExpanded" class="mt-2 text-sm text-gray-600">
                     {{ message.infoContent }}
                   </div>
                 </div>
               </div>
               <!-- 消息文本容器 -->
-              <div class="flex" :class="{ 'justify-end': message.isMine }">
+              <div class="flex items-center" :class="{ 'justify-end': message.isMine }">
                 <div :class="{ 'bg-blue-200': message.isMine, 'bg-gray-300': !message.isMine }"
-                  class="text-black p-2 rounded-lg max-w-xs">
-                  <v-md-preview :text="message.text"></v-md-preview>
+                  class="text-black p-2 rounded-lg max-w-xs flex items-center">
+                  <v-md-preview :text="message.text" class="text-left"></v-md-preview>
                 </div>
               </div>
             </div>
@@ -211,11 +166,11 @@ export default {
       isSidebarOpen: false,
       isHovering: false,
       isHovering2: false,
+      isSettingsOpen: false,
       //要发送的问题
       inputText: null,
       // 对话数组
       messages: [
-        { text: "你好", isMine: true },
         {
           isFirst: true,
           think: false,
@@ -233,6 +188,10 @@ export default {
     if (this.eventSource) {
       this.eventSource.close();
     }
+    document.removeEventListener('click', this.handleClickOutside)
+  },
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside)
   },
   methods: {
     goToDeepSeek() {
@@ -287,6 +246,7 @@ export default {
                 this.messages[this.messages.length - 1].think = false;
                 if (this.messages.costTime == null) {
                   this.messages.costTime = (Math.floor(Date.now() / 1000) - data.created);
+                  this.messages[this.messages.length - 1].isInfoExpanded = false;
                 }
                 this.messages[this.messages.length - 1].text += data.choices[0].delta.content;
               }
@@ -307,9 +267,19 @@ export default {
         };
       }
     },
+    toggleSettings(event) {
+      event.stopPropagation() // 阻止事件冒泡
+      this.isSettingsOpen = !this.isSettingsOpen
+    },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-    }
+    },
+    handleClickOutside(event) {
+      const settingsContainer = document.querySelector('.relative.inline-block.text-left')
+      if (settingsContainer && !settingsContainer.contains(event.target)) {
+        this.isSettingsOpen = false
+      }
+    },
   }
 }
 </script>
@@ -341,5 +311,10 @@ export default {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+.github-markdown-body blockquote, .github-markdown-body details, .github-markdown-body dl, .github-markdown-body ol, .github-markdown-body p, .github-markdown-body pre, .github-markdown-body table, .github-markdown-body ul {
+    margin-top: 0;
+    margin-bottom: 1px;
 }
 </style>
