@@ -4,9 +4,16 @@ server:
 # 阿里云百炼
 aliyun:
   bailian:
-    model: deepSeek-r1
-    api-url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
-    api-key: 阿里云百炼API-KEY
+    # deepseek
+    ds:
+      model: deepSeek-r1
+      api-url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+      api-key: 阿里云百炼API-KEY
+    # 千问
+    qwen25:
+      model: qwen2.5-vl-72b-instruct
+      api-url: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+      api-key: 阿里云百炼API-KEY
 
 # 字节火山
 bytedance:

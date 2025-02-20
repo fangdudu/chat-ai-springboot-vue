@@ -114,47 +114,10 @@
               </a>
             </div>
           </div>
-
-
-
         </div>
         <div class="flex-1 overflow-y-auto p-4">
           <div class="flex flex-col space-y-2">
             <div v-for="(message, index) in messages" :key="index">
-              <div v-if="!message.isMine && !message.isFirst" class="mb-4 w-full">
-                <div @click="message.isInfoExpanded = !message.isInfoExpanded"
-                  :class="['border', 'text-black', 'p-2', 'rounded-lg', 'max-w-xs', 'mb-4 ', 'w-full', message.think ? 'bg-yellow-200' : 'bg-gray-50']">
-                  <div class="flex items-center justify-between">
-                    <span class="inline-flex items-center space-x-2">
-                      <template v-if="message.think && !message.suspend">
-                        <div class="flex items-center space-x-2">
-                          <span>思考中</span>
-                          <svg class="h-4 w-4 animate-spin text-black-200" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                            <path class="opacity-75" fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                        </div>
-                      </template>
-                      <template v-if="!message.think && !message.suspend">
-                        已深度思考（用时{{ this.messages.costTime }}秒）
-                      </template>
-                      <template v-if="message.suspend">
-                        <span class="text-red-400">已暂停</span>
-                      </template>
-                    </span>
-                    <svg class="w-4 h-4 transition-transform duration-200"
-                      :class="{ 'transform rotate-180': message.isInfoExpanded }" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor">
-                      <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                  </div>
-                  <div v-show="message.isInfoExpanded" class="mt-2 text-sm text-black-200">
-                    {{ message.infoContent }}
-                  </div>
-                </div>
-              </div>
               <!-- 消息文本容器 -->
               <div class="flex" :class="{ 'justify-end': message.isMine }">
                 <div :class="{ 'bg-blue-200': message.isMine, 'bg-gray-300': !message.isMine }"
@@ -175,7 +138,7 @@
           <div v-if="selectedImages.length > 0" class="flex gap-1.5 overflow-x-auto pb-2">
             <div v-for="(image, index) in selectedImages" :key="index" class="relative">
               <img :src="image.url" class="h-10 w-10 object-cover rounded-md border border-gray-200" />
-              <button @click="removeImage(index)" 
+              <button @click="removeImage(index)"
                 class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600">
                 ×
               </button>
@@ -185,24 +148,17 @@
           <!-- 输入和按钮区域 -->
           <div class="flex items-center gap-1 min-w-0">
             <!-- 图片上传按钮 -->
-            <input
-              type="file"
-              @change="handleImageSelect"
-              multiple
-              accept="image/*"
-              class="hidden"
-              ref="fileInput"
-            >
-            <button 
-              @click="$refs.fileInput.click()"
+            <input type="file" @change="handleImageSelect" multiple accept="image/*" class="hidden" ref="fileInput">
+            <button @click="$refs.fileInput.click()"
               class="flex-shrink-0 p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-              title="上传图片"
-            >
+              title="上传图片">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 16L8.586 11.414C8.96106 11.0389 9.46967 10.8284 10 10.8284C10.5303 10.8284 11.0389 11.0389 11.414 11.414L16 16M14 14L15.586 12.414C15.9611 12.0389 16.4697 11.8284 17 11.8284C17.5303 11.8284 18.0389 12.0389 18.414 12.414L20 14M14 8H14.01M6 20H18C18.5304 20 19.0391 19.7893 19.4142 19.4142C19.7893 19.0391 20 18.5304 20 18V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V18C4 18.5304 4.21071 19.0391 4.58579 19.4142C4.96086 19.7893 5.46957 20 6 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M4 16L8.586 11.414C8.96106 11.0389 9.46967 10.8284 10 10.8284C10.5303 10.8284 11.0389 11.0389 11.414 11.414L16 16M14 14L15.586 12.414C15.9611 12.0389 16.4697 11.8284 17 11.8284C17.5303 11.8284 18.0389 12.0389 18.414 12.414L20 14M14 8H14.01M6 20H18C18.5304 20 19.0391 19.7893 19.4142 19.4142C19.7893 19.0391 20 18.5304 20 18V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V18C4 18.5304 4.21071 19.0391 4.58579 19.4142C4.96086 19.7893 5.46957 20 6 20Z"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
-            
+
             <!-- 输入框 -->
             <input type="text" v-model="inputText" placeholder="在这里输入消息..."
               class="min-w-0 flex-1 border rounded-full px-3 py-1.5 focus:outline-none">
@@ -210,7 +166,7 @@
             <!--输入按钮-->
             <button v-if="!isChatting"
               class="flex-shrink-0 bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 focus:outline-none"
-              @click="sendMessage">
+              @click="getMessagesKey">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -238,9 +194,10 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Home',
   data() {
     return {
@@ -248,6 +205,8 @@ export default {
       isSidebarOpen: false,
       isHovering: false,
       isHovering2: false,
+      // 存储选中的图片
+      selectedImages: [],
       //要发送的问题
       inputText: null,
       // 对话数组
@@ -257,13 +216,11 @@ export default {
           think: false,
           text: "你好，我是Qwen2.5-VL，有什么我能帮助你的吗？",
           isMine: false,
-          isInfoExpanded: false,
           infoContent: "这是一个信息提示"
         },
       ],
       responseFirst: true, // 对话第一次回复
-      eventSource: null,
-      selectedImages: [], // 存储选中的图片
+      eventSource: null
     };
   },
   beforeUnmount() {
@@ -290,6 +247,30 @@ export default {
       }
       this.isChatting = false;
     },
+    getMessagesKey() {
+      // 先通过 post 将数据传回 后端  后端返回 key
+      // 再拿这个key 去做sse 请求
+      const formData = new FormData();
+      console.log(this.selectedImages);
+      // 添加文本字段（字段名需与后端@RequestPart对应）
+      formData.append("messages", this.inputText);
+
+      // 添加图片文件（确保selectedImages是File对象数组）
+      this.selectedImages.forEach((file, index) => {
+        console.log(file.url);
+      });
+      
+      axios.post("http://127.0.0.1:8089/completions/getChatKey", formData, {
+        headers: {
+          // 必须显式设置 Content-Type 为 multipart/form-data
+          // 但不要带 boundary，浏览器会自动生成
+          "Content-Type": "multipart/form-data"
+        }
+      }).then(res => {
+        console.log(res);
+      }).catch(err => {
+      });
+    },
     sendMessage() {
       // 只有当eventSource不存在时才创建新的EventSource连接
       if (!this.eventSource) {
@@ -298,7 +279,7 @@ export default {
         this.messages.push({ suspend: false, think: true, costTime: null, infoContent: "", text: "", isMine: false });
 
         // 创建新的EventSource连接
-        this.eventSource = new EventSource('http://127.0.0.1:8089/completions?messages=' + this.inputText);
+        this.eventSource = new EventSource('http://127.0.0.1:8089/completions/pic?messages=' + this.inputText);
         // 重置输入框
         this.inputText = "";
         // 设置消息接收的回调函数

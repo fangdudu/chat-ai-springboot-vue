@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.chat_ai.dto.AIAnswerDTO;
 import life.chat_ai.dto.ChatRequestDTO;
+import life.chat_ai.dto.PicChatRequestDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -208,4 +209,73 @@ class GptServiceImplTest {
         List<AIAnswerDTO> allMessages = aiAnswerDTOFlux.collectList().block();
         System.out.println("全量结果: " + allMessages);
     }
+
+    @Value("${aliyun.bailian.qwen25.model}")
+    public String QWEN_MODEL;
+    @Value("${aliyun.bailian.qwen25.api-url}")
+    public String QWEN_API_URL;
+    @Value("${aliyun.bailian.qwen25.api-key}")
+    public String QWEN_API_KEY;
+    @Test
+    void doQwenStream() {
+        //构建请求对象
+        PicChatRequestDTO picChatRequestDTO = new PicChatRequestDTO();
+        //设置模型
+        picChatRequestDTO.setModel(QWEN_MODEL);
+        //设置流式返回
+        picChatRequestDTO.setStream(true);
+        PicChatRequestDTO.StreamOptions streamOptions = new PicChatRequestDTO.StreamOptions();
+        streamOptions.setInclude_usage(true);
+        picChatRequestDTO.setStream_options(streamOptions);
+        //设置请求消息，在此可以加入自己的prompt
+        PicChatRequestDTO.ReqMessage message = new PicChatRequestDTO.ReqMessage();
+        //用户消息
+        message.setRole("user");
+
+        //用户请求内容
+        ArrayList<PicChatRequestDTO.Content> contents = new ArrayList<>();
+        PicChatRequestDTO.Content content_image = new PicChatRequestDTO.Content();
+        content_image.setType("image_url");
+        PicChatRequestDTO.ImageURL imageURL = new PicChatRequestDTO.ImageURL();
+        imageURL.setUrl("https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg");
+        content_image.setImage_url(imageURL);
+        contents.add(content_image);
+
+        PicChatRequestDTO.Content content_text = new PicChatRequestDTO.Content();
+        content_text.setType("text");
+        content_text.setText("图中描绘的是什么景象？");
+        contents.add(content_text);
+
+        message.setContent(contents);
+
+        ArrayList<PicChatRequestDTO.ReqMessage> messages = new ArrayList<>();
+        messages.add(message);
+
+        //设置请求消息
+        picChatRequestDTO.setMessages(messages);
+
+        //构建请求json
+        String paramJson = JSONUtil.toJsonStr(picChatRequestDTO);
+
+        WebClient build = WebClient.builder()//创建webflux的client
+//                .baseUrl("")//填写对应的api地址
+                .defaultHeader("Content-Type", "application/json")//设置默认请求类型
+                .build();
+        //使用webClient发送消息
+        Flux<AIAnswerDTO> aiAnswerDTOFlux = build.post()
+                .uri(QWEN_API_URL)//请求uri
+                .header("Authorization", "Bearer "+QWEN_API_KEY)//设置成自己的key，获得key的方式可以在下文查看
+                //.header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)//设置流式响应
+                .header("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(paramJson))
+                .retrieve()
+                .bodyToFlux(String.class)
+                .flatMap(result -> handleWebClientResponse(result));
+
+        List<AIAnswerDTO> allMessages = aiAnswerDTOFlux.collectList().block();
+        System.out.println("全量结果: " + allMessages);
+    }
+
+
 }
