@@ -248,6 +248,10 @@ export default {
       this.isChatting = false;
     },
     getMessagesKey() {
+      if (!this.selectedImages || this.selectedImages.length === 0) {
+        alert('请选择图片');
+        return;
+      }
       // 先通过 post 将数据传回 后端  后端返回 key
       // 再拿这个key 去做sse 请求
       const formData = new FormData();
@@ -256,7 +260,7 @@ export default {
       });
       formData.append('messages', this.inputText);
       axios.post("http://127.0.0.1:8089/completions/getChatKey", formData).then(response => {
-        if(response.status == 200){
+        if (response.status == 200) {
           const chatKey = response.data.chatKey;
           this.sendMessage(chatKey);
         }
