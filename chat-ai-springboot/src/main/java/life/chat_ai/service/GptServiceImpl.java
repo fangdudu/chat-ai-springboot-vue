@@ -3,25 +3,36 @@ package life.chat_ai.service;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import life.chat_ai.dto.AIAnswerDTO;
 import life.chat_ai.dto.ChatRequestDTO;
 import life.chat_ai.dto.PicChatRequestDTO;
 import life.chat_ai.dto.PicParamsDTO;
+import life.chat_ai.util.PicUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
 
 
 @Service
 public class GptServiceImpl {
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    public static final String REDIS_CHAT_KEY_PREFIX = "CHAT_KEY:";
+
     // 阿里云
     @Value("${aliyun.bailian.ds.model}")
     public String ALIYUN_BAILIAN_MODEL;
@@ -97,7 +108,7 @@ public class GptServiceImpl {
                 //请求uri
                 .uri(SILICONFLOW_API_URL)
                 //设置成自己的key，获得key的方式可以在下文查看
-                .header("Authorization", "Bearer "+SILICONFLOW_API_KEY)
+                .header("Authorization", "Bearer " + SILICONFLOW_API_KEY)
                 //.header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)//设置流式响应
                 .header("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -130,13 +141,29 @@ public class GptServiceImpl {
         }
     }
 
-    public String getChatKeyByPicParams(PicParamsDTO picParamsDTO){
-        System.out.println(picParamsDTO);
-        return "success";
+    public String getChatKeyByPicParams(PicParamsDTO picParamsDTO) throws IOException {
+        List<MultipartFile> files = picParamsDTO.getFiles();
+        LinkedList<String> base64List = new LinkedList<>();
+        for (MultipartFile file : files) {
+            if (PicUtil.isJpgFile(file)) {
+                base64List.add(PicUtil.convertToBase64(file));
+            }
+        }
+        picParamsDTO.setBase64List(base64List);
+        picParamsDTO.setFiles(null);
+        String paramJson = JSONUtil.toJsonStr(picParamsDTO);
+
+        String chatKey = new Date().getTime() + ":" + UUID.randomUUID();
+        stringRedisTemplate.opsForValue().set(REDIS_CHAT_KEY_PREFIX + chatKey, paramJson);
+        return chatKey;
     }
 
+    public Flux<AIAnswerDTO> doPicChatGPTStream(String chatKey) throws JsonProcessingException {
 
-    public Flux<AIAnswerDTO> doPicChatGPTStream(String requestQuestion) {
+        String chatMsg = stringRedisTemplate.opsForValue().get(REDIS_CHAT_KEY_PREFIX + chatKey);
+
+        PicParamsDTO param = objectMapper.readValue(chatMsg, PicParamsDTO.class);
+
         //构建请求对象
         PicChatRequestDTO picChatRequestDTO = new PicChatRequestDTO();
         //设置模型
@@ -152,15 +179,20 @@ public class GptServiceImpl {
         message.setRole("user");
         //用户请求内容
         ArrayList<PicChatRequestDTO.Content> contents = new ArrayList<>();
-        PicChatRequestDTO.Content content_image = new PicChatRequestDTO.Content();
-        content_image.setType("image_url");
-        PicChatRequestDTO.ImageURL imageURL = new PicChatRequestDTO.ImageURL();
-        imageURL.setUrl("https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg");
-        content_image.setImage_url(imageURL);
-        contents.add(content_image);
+
+        // 图片信息
+        for (String base64Str : param.getBase64List()) {
+            PicChatRequestDTO.Content content_image = new PicChatRequestDTO.Content();
+            content_image.setType("image_url");
+            PicChatRequestDTO.ImageURL imageURL = new PicChatRequestDTO.ImageURL();
+            imageURL.setUrl(base64Str);
+            content_image.setImage_url(imageURL);
+            contents.add(content_image);
+        }
+        // 对话信息
         PicChatRequestDTO.Content content_text = new PicChatRequestDTO.Content();
         content_text.setType("text");
-        content_text.setText("图中描绘的是什么景象？");
+        content_text.setText(param.getMessages());
         contents.add(content_text);
         message.setContent(contents);
         ArrayList<PicChatRequestDTO.ReqMessage> messages = new ArrayList<>();
@@ -174,7 +206,7 @@ public class GptServiceImpl {
                 //请求uri
                 .uri(QWEN_API_URL)
                 //设置成自己的key，获得key的方式可以在下文查看
-                .header("Authorization", "Bearer "+QWEN_API_KEY)
+                .header("Authorization", "Bearer " + QWEN_API_KEY)
                 //.header(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE)//设置流式响应
                 .header("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
                 .contentType(MediaType.APPLICATION_JSON)

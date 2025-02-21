@@ -4,10 +4,12 @@ import lombok.Data;
 
 
 
-import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 @Data
 public class PicParamsDTO {
     private String messages;
-    private List<FilePart> images; // 使用 FilePart 接收文件流
+    private List<MultipartFile> files;
+    private List<String> base64List;
 }
