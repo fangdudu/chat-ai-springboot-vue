@@ -251,27 +251,20 @@ export default {
       // 先通过 post 将数据传回 后端  后端返回 key
       // 再拿这个key 去做sse 请求
       const formData = new FormData();
-      console.log(this.selectedImages);
-      // 添加文本字段（字段名需与后端@RequestPart对应）
-      formData.append("messages", this.inputText);
-
-      // 添加图片文件（确保selectedImages是File对象数组）
-      this.selectedImages.forEach((file, index) => {
-        console.log(file.url);
+      this.selectedImages.forEach(image => {
+        formData.append('file', image.file); // 添加图片文件
       });
-      
-      axios.post("http://127.0.0.1:8089/completions/getChatKey", formData, {
-        headers: {
-          // 必须显式设置 Content-Type 为 multipart/form-data
-          // 但不要带 boundary，浏览器会自动生成
-          "Content-Type": "multipart/form-data"
+      formData.append('messages', this.inputText);
+      axios.post("http://127.0.0.1:8089/completions/getChatKey", formData).then(response => {
+        if(response.status == 200){
+          const chatKey = response.data.chatKey;
+          this.sendMessage(chatKey);
         }
-      }).then(res => {
-        console.log(res);
-      }).catch(err => {
+      }).catch(error => {
+        console.error('Error uploading images:', error);
       });
     },
-    sendMessage() {
+    sendMessage(chatKey) {
       // 只有当eventSource不存在时才创建新的EventSource连接
       if (!this.eventSource) {
         this.isChatting = true;
@@ -279,7 +272,7 @@ export default {
         this.messages.push({ suspend: false, think: true, costTime: null, infoContent: "", text: "", isMine: false });
 
         // 创建新的EventSource连接
-        this.eventSource = new EventSource('http://127.0.0.1:8089/completions/pic?messages=' + this.inputText);
+        this.eventSource = new EventSource('http://127.0.0.1:8089/completions/pic?chatKey=' + chatKey);
         // 重置输入框
         this.inputText = "";
         // 设置消息接收的回调函数
