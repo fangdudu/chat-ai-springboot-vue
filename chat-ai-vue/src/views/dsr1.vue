@@ -195,6 +195,7 @@ export default {
   },
   methods: {
     goToDeepSeek() {
+      this.isSidebarOpen = false;
       this.$router.push('/dsr1');
     },
     goToQwen() {
@@ -220,7 +221,7 @@ export default {
         this.messages.push({ suspend: false, think: true, costTime: null, infoContent: "", text: "", isMine: false });
 
         // 创建新的EventSource连接
-        this.eventSource = new EventSource('http://127.0.0.1:8089/completions?messages=' + this.inputText);
+        this.eventSource = new EventSource('http://192.168.1.3:8089/completions?messages=' + this.inputText);
         // 重置输入框
         this.inputText = "";
         // 设置消息接收的回调函数

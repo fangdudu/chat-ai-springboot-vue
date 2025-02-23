@@ -233,6 +233,7 @@ export default {
       this.$router.push('/dsr1');
     },
     goToQwen() {
+      this.isSidebarOpen = false;
       this.$router.push('/qwen2_5');
     },
     suspendChat() {
@@ -259,7 +260,7 @@ export default {
         formData.append('file', image.file); // 添加图片文件
       });
       formData.append('messages', this.inputText);
-      axios.post("http://127.0.0.1:8089/completions/getChatKey", formData).then(response => {
+      axios.post("http://192.168.1.3:8089/completions/getChatKey", formData).then(response => {
         if (response.status == 200) {
           const chatKey = response.data.chatKey;
           this.sendMessage(chatKey);

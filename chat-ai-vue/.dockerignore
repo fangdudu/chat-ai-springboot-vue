@@ -1,0 +1,12 @@
+# .dockerignore 内容
+node_modules/
+.gitignore
+yarn.lock
+README.md
+.git
+dist/
+.DS_Store
+*.log
+.env
+.idea
+.vscode
