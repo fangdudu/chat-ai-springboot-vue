@@ -33,3 +33,7 @@ EXPOSE 8089
 #Java 配置
 ENV JAVA_OPTS="-Xmx512m -Xms256m -Dfile.encoding=UTF-8"
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar chat-ai-springboot.jar"]
+
+
+# 添加 -p 参数映射端口（宿主机端口:容器端口）
+# docker run -d --name chat-ai-springboot -p 8089:8089 chat-ai-springboot

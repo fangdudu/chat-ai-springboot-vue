@@ -1,5 +1,5 @@
 # 构建阶段
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
 
 WORKDIR /app
 
@@ -7,12 +7,12 @@ WORKDIR /app
 RUN yarn config set registry https://registry.npmmirror.com && \
     npm config set registry https://registry.npmmirror.com
 
-# 优先复制包管理相关文件（利用缓存层）
-COPY package.json yarn.lock ./
+# 优先复制包管理相关文件
+COPY package.json ./
 COPY postcss.config.js tailwind.config.js ./
 
 # 安装依赖（使用国内源加速）
-RUN yarn install --frozen-lockfile --network-timeout 300000
+RUN yarn install --frozen-lockfile
 
 # 复制其他项目文件（排除node_modules）
 COPY . .
