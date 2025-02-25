@@ -260,7 +260,7 @@ export default {
         formData.append('file', image.file); // 添加图片文件
       });
       formData.append('messages', this.inputText);
-      axios.post("http://192.168.1.3:8089/completions/getChatKey", formData).then(response => {
+      axios.post("apis/completions/getChatKey", formData).then(response => {
         if (response.status == 200) {
           const chatKey = response.data.chatKey;
           this.sendMessage(chatKey);
@@ -277,7 +277,7 @@ export default {
         this.messages.push({ suspend: false, think: true, costTime: null, infoContent: "", text: "", isMine: false });
 
         // 创建新的EventSource连接
-        this.eventSource = new EventSource('http://127.0.0.1:8089/completions/pic?chatKey=' + chatKey);
+        this.eventSource = new EventSource('apis/completions/pic?chatKey=' + chatKey);
         // 重置输入框
         this.inputText = "";
         // 设置消息接收的回调函数
