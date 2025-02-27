@@ -7,7 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: chat-ai-vue-container
     ports:
-      - "8099:80"
+      - "80:80"
+      - "443:443"
     networks:
       - app-network  # 关键：共享网络
 
@@ -17,8 +18,6 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - /mydata/chat-ai-redis/data:/data #数据文件挂载
-    ports:
-      - 6399:6379 # 端口映射（宿主机端口:容器端口）
     networks:
       - app-network  # 关键：共享网络
 
@@ -29,8 +28,6 @@ services:
     container_name: chat-ai-springboot-container
     depends_on:
       - chat-ai-redis
-    ports:
-      - "8089:8089"  # 主机端口:容器端口 (注意与你的 EXPOSE 端口一致)
     environment:
       - spring.redis.host=chat-ai-redis
       - spring.redis.port=6379

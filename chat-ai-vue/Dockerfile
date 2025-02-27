@@ -23,10 +23,19 @@ RUN yarn build
 # 生产阶段
 FROM nginx:stable-alpine
 
+# 复制构建阶段的dist文件夹
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY vue-nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+# 创建证书目录并设置权限
+RUN mkdir -p /etc/nginx/certs && \
+    chmod 700 /etc/nginx/certs
+
+# 复制SSL证书（注意路径对应）
+COPY cert/chat-ai.life.pem /etc/nginx/certs/
+COPY cert/chat-ai.life.key /etc/nginx/certs/
+
+EXPOSE 80 443
 CMD ["nginx", "-g", "daemon off;"]
 
 # docker run -d -p 宿主机端口:80
