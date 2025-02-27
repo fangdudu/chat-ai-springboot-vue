@@ -1,0 +1,40 @@
+version: '3'
+services:
+  # 前端服务
+  chat-ai-vue:
+    build:
+      context: chat-ai-vue/  # 前端Dockerfile所在目录
+      dockerfile: Dockerfile
+    container_name: chat-ai-vue-container
+    ports:
+      - "8099:80"
+    networks:
+      - app-network  # 关键：共享网络
+
+  chat-ai-redis:
+    image: redis:7
+    container_name: chat-ai-redis-container
+    command: redis-server --appendonly yes
+    volumes:
+      - /mydata/chat-ai-redis/data:/data #数据文件挂载
+    ports:
+      - 6399:6379 # 端口映射（宿主机端口:容器端口）
+
+  chat-ai-springboot:
+    build:
+      context: chat-ai-springboot  # Dockerfile 所在目录
+      dockerfile: Dockerfile
+    container_name: chat-ai-springboot-container
+    depends_on:
+      - chat-ai-redis
+    ports:
+      - "8089:8089"  # 主机端口:容器端口 (注意与你的 EXPOSE 端口一致)
+    environment:
+      - spring.redis.host=chat-ai-redis
+      - spring.redis.post=6379
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

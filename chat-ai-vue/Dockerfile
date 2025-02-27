@@ -28,3 +28,5 @@ COPY vue-nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
+
+# docker run -d -p 宿主机端口:80
