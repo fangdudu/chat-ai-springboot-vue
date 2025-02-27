@@ -19,6 +19,8 @@ services:
       - /mydata/chat-ai-redis/data:/data #数据文件挂载
     ports:
       - 6399:6379 # 端口映射（宿主机端口:容器端口）
+    networks:
+      - app-network  # 关键：共享网络
 
   chat-ai-springboot:
     build:
@@ -31,7 +33,7 @@ services:
       - "8089:8089"  # 主机端口:容器端口 (注意与你的 EXPOSE 端口一致)
     environment:
       - spring.redis.host=chat-ai-redis
-      - spring.redis.post=6379
+      - spring.redis.port=6379
     networks:
       - app-network
 
