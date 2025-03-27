@@ -50,7 +50,7 @@
       <!-- 主要内容区域 -->
       <div class="flex-1 flex flex-col transform transition-transform duration-300 min-w-0"
         :class="{ 'translate-x-44': isSidebarOpen }">
-        <div class="p-4 text-white flex justify-between items-center" style="background-color: rgb(122, 118, 232)">
+        <div class="p-4 text-white flex justify-between items-center" style="background-color: rgb(48, 198, 193)">
           <!--菜单按钮-->
           <button @click="toggleSidebar" class="hover:bg-blue-400 rounded-md p-1">
             <svg v-if="!isSidebarOpen" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none">
@@ -61,7 +61,7 @@
                 stroke-linejoin="round" />
             </svg>
           </button>
-          <span>Qwen2.5-VL</span>
+          <span>Edge-TTS</span>
           <div class="relative inline-block text-left">
             <!--设置按钮-->
             <button id="setting" class="hover:bg-blue-400 rounded-md p-1">
@@ -134,6 +134,10 @@
                 <div :class="{ 'bg-blue-200': message.isMine, 'bg-gray-300': !message.isMine }"
                   class="text-black p-2 rounded-lg max-w-xs">
                   <v-md-preview :text="message.text"></v-md-preview>
+                  <!-- 音频播放 -->
+                  <audio v-if="message.audioUrl" controls>
+                    <source :src="message.audioUrl" type="audio/mpeg">
+                  </audio>
                 </div>
               </div>
             </div>
@@ -145,31 +149,8 @@
 
         <!-- 输入框 -->
         <div class="bg-white p-4 flex flex-col space-y-2">
-          <!-- 图片预览区域 -->
-          <div v-if="selectedImages.length > 0" class="flex gap-1.5 overflow-x-auto pb-2">
-            <div v-for="(image, index) in selectedImages" :key="index" class="relative">
-              <img :src="image.url" class="h-10 w-10 object-cover rounded-md border border-gray-200" />
-              <button @click="removeImage(index)"
-                class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs hover:bg-red-600">
-                ×
-              </button>
-            </div>
-          </div>
-
           <!-- 输入和按钮区域 -->
           <div class="flex items-center gap-1 min-w-0">
-            <!-- 图片上传按钮 -->
-            <input type="file" @change="handleImageSelect" multiple accept="image/*" class="hidden" ref="fileInput">
-            <button @click="$refs.fileInput.click()"
-              class="flex-shrink-0 p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-              title="上传图片">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M4 16L8.586 11.414C8.96106 11.0389 9.46967 10.8284 10 10.8284C10.5303 10.8284 11.0389 11.0389 11.414 11.414L16 16M14 14L15.586 12.414C15.9611 12.0389 16.4697 11.8284 17 11.8284C17.5303 11.8284 18.0389 12.0389 18.414 12.414L20 14M14 8H14.01M6 20H18C18.5304 20 19.0391 19.7893 19.4142 19.4142C19.7893 19.0391 20 18.5304 20 18V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V18C4 18.5304 4.21071 19.0391 4.58579 19.4142C4.96086 19.7893 5.46957 20 6 20Z"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </button>
-
             <!-- 输入框 -->
             <input type="text" v-model="inputText" placeholder="在这里输入消息..."
               class="min-w-0 flex-1 border rounded-full px-3 py-1.5 focus:outline-none">
@@ -177,7 +158,7 @@
             <!--输入按钮-->
             <button v-if="!isChatting"
               class="flex-shrink-0 bg-blue-500 text-white rounded-full p-1.5 hover:bg-blue-600 focus:outline-none"
-              @click="getMessagesKey">
+              @click="sendMessage">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -226,7 +207,7 @@ export default {
         {
           isFirst: true,
           think: false,
-          text: "你好，我是Qwen2.5-VL，有什么我能帮助你的吗？",
+          text: "你好，我是Edge-TTS，有什么我能帮助你的吗？",
           isMine: false,
           infoContent: "这是一个信息提示"
         },
@@ -241,6 +222,37 @@ export default {
     }
   },
   methods: {
+    async sendMessage() {
+      this.isChatting = true;
+      this.messages.push({ infoContent: "", text: this.inputText, isMine: true });
+      this.messages.push({ suspend: false, think: true, costTime: null, infoContent: "", text: "", isMine: false });
+
+      const formData = new FormData();
+      formData.append('messages', this.inputText);
+      try {
+        // 从后端获取音频文件
+        const response = await axios.post('apis/completions/getTTS', formData, {
+          responseType: 'blob', // 重要：告诉 Axios 返回二进制数据
+        });
+        
+        // 将 Blob 转换为 URL
+        const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // 更新最后一条消息，添加音频播放器
+        const lastMessage = this.messages[this.messages.length - 1];
+        lastMessage.think = false;
+        lastMessage.audioUrl = audioUrl;
+        
+        this.inputText = '';
+        this.isChatting = false;
+      } catch (error) {
+        console.error('Error fetching audio:', error);
+        const lastMessage = this.messages[this.messages.length - 1];
+        lastMessage.think = false;
+        lastMessage.text = "Error: Failed to get audio response";
+      }
+    },
     goToDeepSeek() {
       this.$router.push('/dsr1');
     },
@@ -263,81 +275,6 @@ export default {
         this.messages[this.messages.length - 1].text = '对话已暂停';
       }
       this.isChatting = false;
-    },
-    getMessagesKey() {
-      if (!this.selectedImages || this.selectedImages.length === 0) {
-        alert('请选择图片');
-        return;
-      }
-      // 先通过 post 将数据传回 后端  后端返回 key
-      // 再拿这个key 去做sse 请求
-      const formData = new FormData();
-      this.selectedImages.forEach(image => {
-        formData.append('file', image.file); // 添加图片文件
-      });
-      formData.append('messages', this.inputText);
-      axios.post("apis/completions/getChatKey", formData).then(response => {
-        if (response.status == 200) {
-          const chatKey = response.data.chatKey;
-          this.sendMessage(chatKey);
-        }
-      }).catch(error => {
-        console.error('Error uploading images:', error);
-      });
-    },
-    sendMessage(chatKey) {
-      // 只有当eventSource不存在时才创建新的EventSource连接
-      if (!this.eventSource) {
-        this.isChatting = true;
-        this.messages.push({ infoContent: "", text: this.inputText, isMine: true });
-        this.messages.push({ suspend: false, think: true, costTime: null, infoContent: "", text: "", isMine: false });
-
-        // 创建新的EventSource连接
-        this.eventSource = new EventSource('apis/completions/pic?chatKey=' + chatKey);
-        // 重置输入框
-        this.inputText = "";
-        // 设置消息接收的回调函数
-        this.eventSource.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          /*if(data.finish_reason !== undefined && data.finish_reason !== null){
-            //console.log(data.usage);
-            data.usage.completion_tokens;
-            data.usage.prompt_tokens;
-            data.usage.total_tokens
-
-            this.eventSource.close();
-            this.eventSource = null;
-          }*/
-          if (data.choices[0]) {
-            if (data.choices[0].delta.reasoning_content && data.choices[0].delta.reasoning_content !== undefined) {
-              if (data.choices[0].delta.reasoning_content.trim().length > 0) {
-                this.messages[this.messages.length - 1].infoContent += data.choices[0].delta.reasoning_content;
-              }
-            }
-            if (data.choices[0].delta.content && data.choices[0].delta.content !== undefined) {
-              if (data.choices[0].delta.content.trim().length > 0) {
-                this.messages[this.messages.length - 1].think = false;
-                if (this.messages.costTime == null) {
-                  this.messages.costTime = (Math.floor(Date.now() / 1000) - data.created);
-                }
-                this.messages[this.messages.length - 1].text += data.choices[0].delta.content;
-              }
-            }
-          }
-        };
-
-        // 可选：监听错误事件，以便在出现问题时能够重新连接或处理错误
-        this.eventSource.onerror = (event) => {
-          // console.log(event);
-          // console.error("EventSource failed:", event);
-          // 关闭出错的连接
-          this.eventSource.close();
-          // 重置eventSource变量，允许重建连接
-          this.eventSource = null;
-
-          this.isChatting = false;
-        };
-      }
     },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
@@ -395,5 +332,27 @@ export default {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+/* Custom audio player styles */
+audio {
+  width: 250px;
+  height: 30px;
+  padding: 2px;
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: #f3f4f6;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  color: #374151;
+}
+
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-mute-button {
+  background-color: #30C6C1;
+  border-radius: 2px;
 }
 </style>

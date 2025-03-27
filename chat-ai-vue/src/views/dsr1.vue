@@ -13,7 +13,7 @@
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
               @click="goToDeepSeek" @mouseover="isHovering = true" @mouseleave="isHovering = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering }">
-              <img src="../assets/deepseek-color.svg" class="w-4 h-4 mr-1" />
+              <img src="../assets/deepseek-color.webp" class="w-4 h-4 mr-1" />
               <span class="flex-grow">DeepSeek-R1</span>
               <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
                 :class="{ 'opacity-100': isHovering }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,10 +24,21 @@
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
               @click="goToQwen" @mouseover="isHovering2 = true" @mouseleave="isHovering2 = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering2 }">
-              <img src="../assets/qwen-color.svg" class="w-4 h-4 mr-1" />
+              <img src="../assets/qwen-color.webp" class="w-4 h-4 mr-1" />
               <span class="flex-grow">Qwen2.5-VL</span>
               <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
                 :class="{ 'opacity-100': isHovering2 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <button
+              class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
+              @click="goToTTS" @mouseover="isHovering3 = true" @mouseleave="isHovering3 = false"
+              :class="{ 'bg-blue-50 shadow-md': isHovering3 }">
+              <img src="../assets/ocr.webp" class="w-4 h-4 mr-1" />
+              <span class="flex-grow">Edge-TTS</span>
+              <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
+                :class="{ 'opacity-100': isHovering3 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -166,6 +177,7 @@ export default {
       isSidebarOpen: false,
       isHovering: false,
       isHovering2: false,
+      isHovering3: false,
       isSettingsOpen: false,
       //要发送的问题
       inputText: null,
@@ -200,6 +212,10 @@ export default {
     },
     goToQwen() {
       this.$router.push('/qwen2_5');
+    },
+    goToTTS() {
+      this.isSidebarOpen = false;
+      this.$router.push('/tts');
     },
     suspendChat() {
       if (this.eventSource) {
