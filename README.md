@@ -1,28 +1,21 @@
 # chat-ai-springboot-vue
 基于springboot-vue实现的AI聊天demo
 
-![deepseek-r1](https://i.miji.bid/2025/02/27/436ee1277135a1d90ac5ea0476b90758.gif)
-
-
-
-![千问2.5VL](https://i.miji.bid/2025/02/27/ff71ad62937dceb31fa57ea8dd824f0b.gif)
-
-
-
 前端技术栈：Vue3, tailwindcss
 
 后端技术栈：Springboot, Webflux, Redis
-
-
 
 已接入
 - 阿里云百炼平台(deepseek-r1/qwen2.5-vl)
 - 字节火山引擎(deepseek-r1)
 - 硅基流动平台(deepseek-r1)
+- Edge-TTS语音生成
 
+![deepseek-r1](https://i.miji.bid/2025/02/27/436ee1277135a1d90ac5ea0476b90758.gif)
 
+![千问2.5VL](https://i.miji.bid/2025/02/27/ff71ad62937dceb31fa57ea8dd824f0b.gif)
 
-启动流程：
+运维流程：
 
 1. 宿主机安装Docker
 2. 通过Docker-Compose将服务部署到宿主机中
