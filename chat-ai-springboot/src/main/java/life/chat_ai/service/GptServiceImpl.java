@@ -11,8 +11,11 @@ import life.chat_ai.dto.ChatRequestDTO;
 import life.chat_ai.dto.PicChatRequestDTO;
 import life.chat_ai.dto.PicParamsDTO;
 import life.chat_ai.util.PicUtil;
+import life.chat_ai.util.TTSUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -63,7 +67,8 @@ public class GptServiceImpl {
     public String QWEN_API_URL;
     @Value("${aliyun.bailian.qwen25.api-key}")
     public String QWEN_API_KEY;
-
+    @Value("${tts.path}")
+    public String TTS_PATH;
 
     //webflux的client
     private WebClient webClient;
@@ -217,4 +222,14 @@ public class GptServiceImpl {
                 .flatMap(result -> handleWebClientResponse(result));
     }
 
+    public Resource createTTSFile(String messages) {
+        String ttsStorageFileName = TTSUtil.createTTSFile(messages);
+        String filePath = TTS_PATH + File.separator + ttsStorageFileName;
+        Resource resource = new FileSystemResource(filePath);
+        // 检查文件是否存在
+        if (!resource.exists()) {
+            return null;
+        }
+        return resource;
+    }
 }

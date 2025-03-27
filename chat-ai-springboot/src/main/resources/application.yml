@@ -40,3 +40,8 @@ siliconflow:
   api-key: 硅基流动API-KEY
 
 # Azure
+
+
+# tts 生成文件存放路径
+tts:
+  path: "./tts"

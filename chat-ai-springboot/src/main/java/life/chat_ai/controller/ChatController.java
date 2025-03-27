@@ -5,18 +5,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import life.chat_ai.dto.AIAnswerDTO;
 import life.chat_ai.dto.PicParamsDTO;
 import life.chat_ai.service.GptServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
+
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.Map;
 public class ChatController {
 
     //用于流式请求第三方的实现类
-    @Resource
+    @Autowired
     GptServiceImpl gptService;
 
     //通过stream返回流式数据
@@ -70,5 +70,22 @@ public class ChatController {
                 )
                 //发生异常时发送空对象
                 .onErrorResume(e -> Flux.empty());
+    }
+
+    @PostMapping("/completions/getTTS")
+    public ResponseEntity getTTS(String messages) throws IOException {
+        Resource resource = gptService.createTTSFile(messages);
+        // 设置响应头
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + resource.getFilename());
+        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        headers.add(HttpHeaders.PRAGMA, "no-cache");
+        headers.add(HttpHeaders.EXPIRES, "0");
+        // 返回 MP3 文件流
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .body(resource);
     }
 }

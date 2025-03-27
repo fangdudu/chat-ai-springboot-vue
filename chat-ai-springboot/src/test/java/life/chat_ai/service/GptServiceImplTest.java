@@ -11,12 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -276,6 +278,11 @@ class GptServiceImplTest {
         List<AIAnswerDTO> allMessages = aiAnswerDTOFlux.collectList().block();
         System.out.println("全量结果: " + allMessages);
     }
+    @Test
+    public void createTTSFile() throws IOException {
+        Resource resource = gptService.createTTSFile("输出123");
 
+        System.out.println(resource.getURL());
+    }
 
 }
