@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import life.chat_ai.dto.AIAnswerDTO;
 import life.chat_ai.dto.ChatRequestDTO;
 import life.chat_ai.dto.PicChatRequestDTO;
+import life.chat_ai.dto.PicParamsDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,13 +15,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @SpringBootTest
@@ -280,9 +285,19 @@ class GptServiceImplTest {
     }
     @Test
     public void createTTSFile() throws IOException {
-        Resource resource = gptService.createTTSFile("输出123");
+        Resource resource = gptService.returnTTSFile("输出123");
 
         System.out.println(resource.getURL());
+    }
+
+    @Test
+    public void test() throws IOException {
+        PicParamsDTO picParamsDTO = new PicParamsDTO();
+        List<MultipartFile> files = new ArrayList<>();
+        files.add(new MockMultipartFile("file", "test1.jpg", MediaType.IMAGE_JPEG_VALUE, new FileInputStream("D:\\测试图片\\test1.jpg")));
+        picParamsDTO.setFiles(files);
+        Map<String, Object> stringObjectMap = gptService.ocrRequest(picParamsDTO);
+        System.out.println(stringObjectMap);
     }
 
 }

@@ -74,7 +74,7 @@ public class ChatController {
 
     @PostMapping("/completions/getTTS")
     public ResponseEntity getTTS(String messages) throws IOException {
-        Resource resource = gptService.createTTSFile(messages);
+        Resource resource = gptService.returnTTSFile(messages);
         // 设置响应头
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + resource.getFilename());
@@ -88,4 +88,27 @@ public class ChatController {
                 .contentType(MediaType.parseMediaType("audio/mpeg"))
                 .body(resource);
     }
+
+    /**
+     * 处理多张图片的 OCR 识别，返回识别后的图片和所有文字
+     * @param files 上传的多张图片
+     * @return 包含图片文件和识别文字的响应
+     * @throws IOException 如果文件操作失败
+     */
+    @PostMapping(value = "/completions/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> processOcrImages(@RequestPart("file") List<MultipartFile> files) throws IOException {
+        // 1. 准备 PicParamsDTO
+        PicParamsDTO picParamsDTO = new PicParamsDTO();
+        picParamsDTO.setFiles(files);
+
+        // 2. 调用服务处理 OCR
+        Map<String, Object> response = gptService.ocrRequest(picParamsDTO);
+
+        // 3. 返回响应
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
+    }
+
 }

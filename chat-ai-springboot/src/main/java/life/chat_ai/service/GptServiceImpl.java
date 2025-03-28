@@ -6,12 +6,12 @@ import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import life.chat_ai.dto.AIAnswerDTO;
-import life.chat_ai.dto.ChatRequestDTO;
-import life.chat_ai.dto.PicChatRequestDTO;
-import life.chat_ai.dto.PicParamsDTO;
+import life.chat_ai.dto.*;
+import life.chat_ai.util.ImageDrawUtil;
 import life.chat_ai.util.PicUtil;
 import life.chat_ai.util.TTSUtil;
+import net.sourceforge.tess4j.Word;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -23,11 +23,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-
+import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
+import java.util.List;
 
 
 @Service
@@ -222,7 +226,7 @@ public class GptServiceImpl {
                 .flatMap(result -> handleWebClientResponse(result));
     }
 
-    public Resource createTTSFile(String messages) {
+    public Resource returnTTSFile(String messages) {
         String ttsStorageFileName = TTSUtil.createTTSFile(messages);
         String filePath = TTS_PATH + File.separator + ttsStorageFileName;
         Resource resource = new FileSystemResource(filePath);
@@ -232,4 +236,75 @@ public class GptServiceImpl {
         }
         return resource;
     }
+
+    // 添加 ocrRequest 方法
+    public Map<String, Object> ocrRequest(PicParamsDTO picParamsDTO) throws IOException {
+        List<String> imageBase64List = new ArrayList<>();
+        String url = "http://103.246.245.13:5000/ocr";
+
+        List<MultipartFile> files = picParamsDTO.getFiles();
+        for (MultipartFile file : files) {
+            String base64Str = Base64.encodeBase64String(file.getBytes());
+
+            Map<String, String> map = new HashMap<>();
+            map.put("image", base64Str);
+            String paramJson = JSONUtil.toJsonStr(map);
+
+            Mono<OcrResponseDTO> ocrResponseDTOMono = webClient.post()
+                    .uri(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(paramJson)
+                    .retrieve()
+                    .bodyToMono(OcrResponseDTO.class);
+
+            // 阻塞获取结果
+            OcrResponseDTO response = ocrResponseDTOMono.block();  // 注意：这会阻塞线程
+            if (response != null) {
+                List<Word> wordList = new ArrayList<>();
+                OcrResponseDTO.OcrResult result = response.getResult();
+                System.out.println("Error Code: " + result.getErrcode());
+                System.out.println("Image Height: " + result.getHeight());
+                System.out.println("Image Width: " + result.getWidth());
+                System.out.println("Image Path: " + result.getImgpath());
+                System.out.println("OCR Results:");
+                result.getOcr_response().forEach(item -> {
+                    System.out.printf("Text: %s, Position: (%.2f, %.2f, %.2f, %.2f), Rate: %.4f%n", item.getText(), item.getLeft(), item.getTop(), item.getRight(), item.getBottom(), item.getRate());
+
+                    // 计算 Rectangle 参数
+                    int x = (int) Math.round(item.getLeft());
+                    int y = (int) Math.round(item.getTop());
+                    int width = (int) Math.round(item.getRight() - item.getLeft());
+                    int height = (int) Math.round(item.getBottom() - item.getTop());
+
+                    // 创建 Rectangle
+                    Rectangle rect = new Rectangle(x, y, width, height);
+
+                    // 创建 Word 对象
+                    Word word = new Word(
+                            item.getText(),
+                            (float) item.getRate(),  // confidence 使用 rate
+                            rect
+                    );
+                    wordList.add(word);
+                });
+                try {
+                    OutputStream outputStream = ImageDrawUtil.imgDraw(file.getInputStream(), wordList);
+                    // 转为base64字符串 返回给前端
+                    ByteArrayOutputStream byteArrayOutputStream = (ByteArrayOutputStream) outputStream;
+                    byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                    String base64 = Base64.encodeBase64String(imageBytes);
+                    imageBase64List.add("data:image/jpeg;base64," + base64);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("text", "test");  // 所有识别的文字
+        response.put("images", imageBase64List);  // Base64 编码的图片数据
+
+        return response;
+    }
 }
+
