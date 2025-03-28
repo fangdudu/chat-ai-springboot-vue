@@ -11,7 +11,7 @@ services:
       - "443:443"
     networks:
       - app-network  # 关键：共享网络
-
+  # redis
   chat-ai-redis:
     image: redis:7
     container_name: chat-ai-redis-container
@@ -21,6 +21,14 @@ services:
     networks:
       - app-network  # 关键：共享网络
 
+  # wechat ocr api
+  chat-ai-wechat-ocr-api:
+    image: golangboyme/wxocr
+    container_name: chat-ai-wechat-ocr-api-container
+    networks:
+      - app-network
+
+  # 后端服务
   chat-ai-springboot:
     build:
       context: chat-ai-springboot  # Dockerfile 所在目录
