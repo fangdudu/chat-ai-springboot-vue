@@ -2,14 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import dsr1 from './views/dsr1.vue'
 import qwen2_5 from './views/qwen2_5.vue'
 import tts from './views/tts.vue'
-
+import ocr from './views/ocr.vue'
 // ... 导入其他demo组件
 
 const routes = [
     { path: '/', component: dsr1 },
     { path: '/dsr1', component: dsr1 },
     { path: '/qwen2_5', component: qwen2_5 },
-    { path: '/tts', component: tts }
+    { path: '/tts', component: tts },
+    { path: '/ocr', component: ocr }
     // ... 可能的其他路由
 ]
 
