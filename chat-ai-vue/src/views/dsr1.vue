@@ -35,10 +35,21 @@
               class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
               @click="goToTTS" @mouseover="isHovering3 = true" @mouseleave="isHovering3 = false"
               :class="{ 'bg-blue-50 shadow-md': isHovering3 }">
-              <img src="../assets/ocr.webp" class="w-4 h-4 mr-1" />
+              <img src="../assets/tts.webp" class="w-4 h-4 mr-1" />
               <span class="flex-grow">Edge-TTS</span>
               <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
                 :class="{ 'opacity-100': isHovering3 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <button
+              class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
+              @click="goToOcr" @mouseover="isHovering4 = true" @mouseleave="isHovering4 = false"
+              :class="{ 'bg-blue-50 shadow-md': isHovering4 }">
+              <img src="../assets/ocr.webp" class="w-4 h-4 mr-1" />
+              <span class="flex-grow">Ocr</span>
+              <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
+                :class="{ 'opacity-100': isHovering4 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -133,6 +144,7 @@
         </div>
 
         <div class="bg-white p-4 flex items-center">
+          <!-- 文本输入框 -->
           <input type="text" v-model="this.inputText" placeholder="在这里输入消息..."
             class="flex-1 border rounded-full px-4 py-2 focus:outline-none">
           <!--输入按钮-->
@@ -178,6 +190,7 @@ export default {
       isHovering: false,
       isHovering2: false,
       isHovering3: false,
+      isHovering4: false,
       isSettingsOpen: false,
       //要发送的问题
       inputText: null,
@@ -216,6 +229,10 @@ export default {
     goToTTS() {
       this.isSidebarOpen = false;
       this.$router.push('/tts');
+    },
+    goToOcr() {
+      this.isSidebarOpen = false;
+      this.$router.push('/ocr');
     },
     suspendChat() {
       if (this.eventSource) {
