@@ -3,60 +3,7 @@
   <div class="bg-gray-100 h-screen max-w-lg mx-auto relative overflow-hidden">
     <div class="flex h-full">
       <!-- 侧边栏 -->
-      <div class="w-44 bg-white shadow-lg transform transition-transform duration-300 absolute h-full"
-        :class="{ 'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen }">
-        <div class="p-3">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold">模型广场</h2>
-          </div>
-          <div class="space-y-2">
-            <button
-              class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToDeepSeek" @mouseover="isHovering = true" @mouseleave="isHovering = false"
-              :class="{ 'bg-blue-50 shadow-md': isHovering }">
-              <img src="../assets/deepseek-color.webp" class="w-4 h-4 mr-1" />
-              <span class="flex-grow">DeepSeek-R1</span>
-              <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
-                :class="{ 'opacity-100': isHovering }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button
-              class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToQwen" @mouseover="isHovering2 = true" @mouseleave="isHovering2 = false"
-              :class="{ 'bg-blue-50 shadow-md': isHovering2 }">
-              <img src="../assets/qwen-color.webp" class="w-4 h-4 mr-1" />
-              <span class="flex-grow">Qwen2.5-VL</span>
-              <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
-                :class="{ 'opacity-100': isHovering2 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button
-              class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToTTS" @mouseover="isHovering3 = true" @mouseleave="isHovering3 = false"
-              :class="{ 'bg-blue-50 shadow-md': isHovering3 }">
-              <img src="../assets/tts.webp" class="w-4 h-4 mr-1" />
-              <span class="flex-grow">Edge-TTS</span>
-              <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
-                :class="{ 'opacity-100': isHovering3 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button
-              class="w-full text-left px-2 py-1 text-sm text-gray-700 rounded-md flex items-center transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-50 hover:shadow-md hover:text-blue-600"
-              @click="goToOcr" @mouseover="isHovering4 = true" @mouseleave="isHovering4 = false"
-              :class="{ 'bg-blue-50 shadow-md': isHovering4 }">
-              <img src="../assets/ocr.webp" class="w-4 h-4 mr-1" />
-              <span class="flex-grow">OCR</span>
-              <svg class="w-4 h-4 text-gray-400 opacity-0 transition-opacity duration-200"
-                :class="{ 'opacity-100': isHovering4 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+      <Sidebar :is-sidebar-open="isSidebarOpen" />
 
       <!-- 主要内容区域 -->
       <div class="flex-1 flex flex-col transform transition-transform duration-300 min-w-0"
@@ -145,6 +92,14 @@
                 <div :class="{ 'bg-blue-200': message.isMine, 'bg-gray-300': !message.isMine }"
                   class="text-black p-2 rounded-lg max-w-xs">
                   <v-md-preview :text="message.text"></v-md-preview>
+                  <!-- 显示图片 -->
+                  <div v-if="message.images && message.images.length > 0" class="mt-2">
+                    <img v-for="(image, index) in message.images" :key="index" 
+                      :src="image" 
+                      class="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90"
+                      alt="OCR识别结果图片"
+                      @click="downloadImage(image)" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -216,10 +171,13 @@
 
 <script>
 import axios from 'axios';
-
+import Sidebar from '../components/Sidebar.vue';
 
 export default {
   name: 'Home',
+  components: {
+    Sidebar
+  },
   data() {
     return {
       isChatting: false,
@@ -252,21 +210,6 @@ export default {
     }
   },
   methods: {
-    goToDeepSeek() {
-      this.$router.push('/dsr1');
-    },
-    goToQwen() {
-      this.isSidebarOpen = false;
-      this.$router.push('/qwen2_5');
-    },
-    goToTTS() {
-      this.isSidebarOpen = false;
-      this.$router.push('/tts');
-    },
-    goToOcr() {
-      this.isSidebarOpen = false;
-      this.$router.push('/ocr');
-    },
     suspendChat() {
       if (this.eventSource) {
         this.eventSource.close();
@@ -284,16 +227,30 @@ export default {
         alert('请选择图片');
         return;
       }
-      // 先通过 post 将数据传回 后端  后端返回 key
-      // 再拿这个key 去做sse 请求
+      // 发生图片ocr请求后
       const formData = new FormData();
       this.selectedImages.forEach(image => {
         formData.append('file', image.file); // 添加图片文件
       });
       axios.post("http://localhost:8089/completions/ocr", formData).then(response => {
-      // axios.post("apis/completions/ocr", formData).then(response => {
         if (response.status == 200) {
-          
+          // 接受到数据后
+          const { images, text } = response.data;
+          // 添加用户消息
+          this.messages.push({ 
+            infoContent: "", 
+            text: "已上传图片", 
+            isMine: true 
+          });
+          // 添加系统回复消息
+          this.messages.push({ 
+            infoContent: "", 
+            text: text, 
+            isMine: false,
+            images: images // 存储图片数据
+          });
+          // 清空已选择的图片
+          this.selectedImages = [];
         }
       }).catch(error => {
         console.error('Error uploading images:', error);
@@ -323,6 +280,18 @@ export default {
     },
     removeImage(index) {
       this.selectedImages.splice(index, 1);
+    },
+    downloadImage(imageData) {
+      // 创建一个临时的a标签
+      const link = document.createElement('a');
+      link.href = imageData;
+      // 设置下载文件名
+      link.download = `ocr_result_${new Date().getTime()}.jpg`;
+      // 触发点击事件
+      document.body.appendChild(link);
+      link.click();
+      // 清理
+      document.body.removeChild(link);
     },
   }
 }
