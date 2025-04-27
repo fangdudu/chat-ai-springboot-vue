@@ -17,6 +17,8 @@
 
 ![千问2.5VL](https://i.miji.bid/2025/02/27/ff71ad62937dceb31fa57ea8dd824f0b.gif)
 
+![EdgeTTS](https://i.miji.bid/2025/04/27/9ba1cd6563d20ec15517ab17918cd35b.gif)
+
 运维流程：
 
 1. 宿主机安装Docker
