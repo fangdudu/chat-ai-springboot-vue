@@ -232,7 +232,7 @@ export default {
       this.selectedImages.forEach(image => {
         formData.append('file', image.file); // 添加图片文件
       });
-      axios.post("http://localhost:8089/completions/ocr", formData).then(response => {
+      axios.post("apis/completions/ocr", formData).then(response => {
         if (response.status == 200) {
           // 接受到数据后
           const { images, text } = response.data;
